@@ -39,7 +39,7 @@ async def fetch_ward_weather(
                 async with session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=30)) as resp:
                     if resp.status == 200:
                         data = await resp.json()
-                        return _parse_response(data, ward_code)
+                        return _parse_response(data, ward_code, lat, lng)
 
                     if resp.status == 429:
                         wait = 2 ** (attempt + 1)
@@ -63,7 +63,7 @@ async def fetch_ward_weather(
     return None
 
 
-def _parse_response(data: dict, ward_code: str) -> dict[str, Any]:
+def _parse_response(data: dict, ward_code: str, lat: float, lng: float) -> dict[str, Any]:
     """Extract structured weather data from API response."""
     current = data.get("current", {})
     forecast = data.get("forecast", {})
@@ -113,6 +113,8 @@ def _parse_response(data: dict, ward_code: str) -> dict[str, Any]:
 
     return {
         "ward_code": ward_code,
+        "latitude": lat,
+        "longitude": lng,
         "temperature_c": current.get("temp_c"),
         "condition_text": condition.get("text"),
         "condition_icon": condition.get("icon"),

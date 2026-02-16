@@ -50,6 +50,8 @@ async def upsert_weather_batch(client: Client, weather_results: list[dict[str, A
     for w in weather_results:
         rows.append({
             "ward_code": w["ward_code"],
+            "latitude": w["latitude"],
+            "longitude": w["longitude"],
             "temperature_c": w["temperature_c"],
             "condition_text": w["condition_text"],
             "condition_icon": w["condition_icon"],

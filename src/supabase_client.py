@@ -24,7 +24,7 @@ async def get_all_wards(client: Client, limit: int = 0) -> list[dict[str, Any]]:
 
     Args:
         client: Supabase client instance
-        limit: Max wards to return (0 = all)
+        limit: Max wards to return (0 = all, defaults to 10000 to cover all 4468 wards)
 
     Returns:
         List of dicts with ward_code, latitude, longitude
@@ -33,6 +33,9 @@ async def get_all_wards(client: Client, limit: int = 0) -> list[dict[str, Any]]:
 
     if limit > 0:
         query = query.limit(limit)
+    else:
+        # Default limit is often 1000, so we must set a higher limit to get all wards
+        query = query.limit(10000)
 
     result = query.execute()
     Actor.log.info(f"📍 Fetched {len(result.data)} ward coordinates from Supabase.")

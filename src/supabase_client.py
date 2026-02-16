@@ -29,17 +29,36 @@ async def get_all_wards(client: Client, limit: int = 0) -> list[dict[str, Any]]:
     Returns:
         List of dicts with ward_code, latitude, longitude
     """
-    query = client.schema("ai_intelligence").table("weather_cache").select("ward_code, latitude, longitude")
-
     if limit > 0:
-        query = query.limit(limit)
-    else:
-        # Default limit is often 1000, so we must set a higher limit to get all wards
-        query = query.limit(10000)
+        # Standard query with limit
+        query = client.schema("ai_intelligence").table("weather_cache").select("ward_code, latitude, longitude")
+        result = query.limit(limit).execute()
+        Actor.log.info(f"📍 Fetched {len(result.data)} ward coordinates from Supabase (Limit: {limit}).")
+        return result.data
+    
+    # Pagination loop for limit=0 (fetchAll)
+    all_wards = []
+    page_size = 1000
+    start = 0
+    
+    while True:
+        query = client.schema("ai_intelligence").table("weather_cache").select("ward_code, latitude, longitude")
+        result = query.range(start, start + page_size - 1).execute()
+        
+        batch = result.data
+        if not batch:
+            break
+            
+        all_wards.extend(batch)
+        Actor.log.info(f"📍 Fetched page {start}-{start + len(batch) - 1} from Supabase. Total so far: {len(all_wards)}")
+        
+        if len(batch) < page_size:
+            break
+            
+        start += page_size
 
-    result = query.execute()
-    Actor.log.info(f"📍 Fetched {len(result.data)} ward coordinates from Supabase.")
-    return result.data
+    Actor.log.info(f"✅ Total wards fetched: {len(all_wards)}")
+    return all_wards
 
 
 async def upsert_weather_batch(client: Client, weather_results: list[dict[str, Any]]) -> int:

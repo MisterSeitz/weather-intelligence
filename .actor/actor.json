@@ -1,0 +1,14 @@
+{
+    "actorSpecification": 1,
+    "name": "weather-intelligence",
+    "title": "Weather Intelligence Actor",
+    "description": "Fetches weather forecasts and alerts from WeatherAPI.com for 4468 South African wards and upserts to Supabase.",
+    "version": "1.0",
+    "buildTag": "latest",
+    "input": "./input_schema.json",
+    "meta": {
+        "templateId": "python-empty",
+        "generatedBy": "Gemini with Antigravity"
+    },
+    "dockerfile": "../Dockerfile"
+}

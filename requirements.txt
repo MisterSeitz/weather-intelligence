@@ -1,0 +1,8 @@
+# Apify SDK
+apify < 4.0.0
+
+# HTTP client for async WeatherAPI calls
+aiohttp >= 3.9.0
+
+# Supabase Python client
+supabase >= 2.0.0
